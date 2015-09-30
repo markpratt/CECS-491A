@@ -65,6 +65,9 @@ public class newEventInfo extends Activity {
                 String time = time_editText.getText().toString();
 
                 ParseUser currentUser = ParseUser.getCurrentUser();
+                String currentUserString = ParseUser.getCurrentUser().getUsername();
+
+
 
                 ParseObject eventinfo = new ParseObject("event");
                 eventinfo.put("eventName", name);
@@ -74,7 +77,12 @@ public class newEventInfo extends Activity {
                 eventinfo.put("eventTime", time);
                 eventinfo.put("eventCreator",currentUser);
                 eventinfo.saveInBackground();
-                System.out.println("Saved in background");
+
+                System.out.println("Saved in backgroud");
+                System.out.println("Current User ID: " + currentUser);
+                System.out.println("Current User ID String:" + currentUserString);
+
+
 
                 Intent intent = new Intent(context, eventView.class);
                 startActivity(intent);

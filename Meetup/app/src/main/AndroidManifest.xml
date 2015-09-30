@@ -47,6 +47,10 @@
             android:name=".newEventInfo"
             android:label="@string/title_activity_new_event_info" >
         </activity>
+        <activity
+            android:name=".friendManager"
+            android:label="@string/title_activity_friend_manager" >
+        </activity>
     </application>
 
 </manifest>

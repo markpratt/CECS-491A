@@ -13,11 +13,14 @@ import android.widget.ListView;
 import com.parse.ParseUser;
 import com.parse.ParseObject;
 import com.parse.ParseQueryAdapter;
-import com.parse.ParseQuery;
-import com.parse.ParseException;
-import com.parse.FindCallback;
-import java.util.List;
 
+import com.parse.Parse.*;
+import com.parse.ParseUser;
+import com.parse.ParseQuery;
+//import java.text.ParseException;
+import com.parse.*;
+import com.parse.ParseException;
+import java.util.List;
 
 
 public class eventView extends Activity {
@@ -25,6 +28,7 @@ public class eventView extends Activity {
     private ParseQueryAdapter<ParseObject> mainAdapter;
     //private CustomAdapter urgentTodosAdapter;
     private ListView listView;
+    private CustomAdapter adapter2;
 
 
     @Override
@@ -33,37 +37,74 @@ public class eventView extends Activity {
         setContentView(R.layout.activity_event_view);
         getActionBar().hide();
         toNewEventInfo();
+        toFriendManger();
+        final ParseUser currentUser = ParseUser.getCurrentUser();
 
+        Intent i = getIntent();
+        System.out.println("Intent: " + i);
 
+        //ParseQueryAdapter<ParseObject> adapter = new ParseQueryAdapter<ParseObject>(this, "event");
+        //adapter.setTextKey("eventName");
 
-/*
-        // Create query to get all events where eventCreator matches current user's id.  Pass to ParseQueryAdapter
-        mainAdapter = new ParseQueryAdapter<ParseObject>(this, new ParseQueryAdapter.QueryFactory<ParseObject>()
-        {
-            public ParseQuery create()
-            {
-                ParseQuery<ParseObject> eventQuery = ParseQuery.getQuery("event");
-                eventQuery.whereEqualTo("eventCreator", ParseUser.getCurrentUser());
-                return eventQuery;
+        /*ParseQueryAdapter<ParseObject> adapter =
+                new ParseQueryAdapter<ParseObject>(this,new ParseQueryAdapter.QueryFactory<ParseObject>(){
+                    public ParseQuery<ParseObject> create(){
+                ParseQuery query = new ParseQuery("event");
+                //query.whereContains("eventCreator", currentUser.getUsername());
+                //query.whereContains("eventCreator", currentUser);
+                query.whereEqualTo("eventCreator",currentUser);
+                return query;
             }
-        }); */
-
-        //mainAdapter = new ParseQueryAdapter<ParseObject>(this, "event");
-        mainAdapter.setTextKey("eventName");
-        //mainAdapter.setImageKey("image");
-        //mainAdapter.setTextKey("eventDetails");
+        });
 
 
-        // Initialize the subclass of ParseQueryAdapter
-       //urgentTodosAdapter = new CustomAdapter(this);
+
+        //ParseQuery<ParseObject> query = ParseQuery.getQuery("event");
+        //query.whereEqualTo("eventCreator", ParseUser.getCurrentUser());
 
 
-        listView = (ListView) findViewById(R.id.event_listView);
-        listView.setAdapter(mainAdapter);
-        mainAdapter.loadObjects();
 
+        ParseQueryAdapter<ParseObject> adapter =
+                new ParseQueryAdapter<ParseObject>(this,new ParseQueryAdapter.QueryFactory<ParseObject>(){
+                    public ParseQuery<ParseObject> create() {
+
+
+
+                        ParseQuery<ParseObject> eventQuery = ParseQuery.getQuery("event");
+                        eventQuery.whereEqualTo("eventCreator", ParseUser.getCurrentUser());
+
+
+
+                        eventQuery.findInBackground(new FindCallback<ParseObject>() {
+
+
+                            public void done(List<ParseObject> objects, ParseException e) {
+                                if (e == null) {
+
+
+                                }
+                            }
+                        });
+                    return eventQuery;
+                    }
+
+                });
+
+          */
+        adapter2 = new CustomAdapter(this);
+        adapter2.setTextKey("eventName");
+
+
+        System.out.println("User Name 1: "+ ParseUser.getCurrentUser().toString());
+        System.out.println("User Name 2: "+ currentUser.getUsername());
+
+        ListView listView = (ListView) findViewById(R.id.event_listView);
+        listView.setAdapter(adapter2);
 
     }
+
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -96,6 +137,20 @@ public class eventView extends Activity {
             @Override
             public void onClick(View arg0){
                 Intent intent = new Intent(context, newEventInfo.class);
+                startActivity(intent);
+            }
+        });
+
+    }
+
+    public void toFriendManger(){
+
+        final Context context = this;
+        Button button = (Button)findViewById(R.id.friendManageButton);
+        button.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View arg0){
+                Intent intent = new Intent(context, friendManager.class);
                 startActivity(intent);
             }
         });
