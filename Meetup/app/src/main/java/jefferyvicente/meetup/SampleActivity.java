@@ -78,10 +78,10 @@ public class SampleActivity extends Activity {
      * Shows the profile of the given user.
      */
     private void showProfileLoggedIn() {
-        View x = findViewById(R.id.continue_button);
-        x.setVisibility(View.VISIBLE);
+        View hideButton = findViewById(R.id.continue_button);
+        hideButton.setVisibility(View.VISIBLE);
 
-        titleTextView.setText("YOu are logged in as ");
+        titleTextView.setText("You are logged in as ");
         emailTextView.setText(currentUser.getEmail());
         String fullName = currentUser.getString("name");
         if (fullName != null) {
