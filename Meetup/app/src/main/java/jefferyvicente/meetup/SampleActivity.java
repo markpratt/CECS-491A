@@ -81,7 +81,7 @@ public class SampleActivity extends Activity {
         View x = findViewById(R.id.continue_button);
         x.setVisibility(View.VISIBLE);
 
-        titleTextView.setText("YOu are logged in as ");
+        titleTextView.setText("You are logged in as ");
         emailTextView.setText(currentUser.getEmail());
         String fullName = currentUser.getString("name");
         if (fullName != null) {
@@ -108,7 +108,7 @@ public class SampleActivity extends Activity {
      * Show a message asking the user to log in, toggle login/logout button text.
      */
     private void showProfileLoggedOut() {
-        titleTextView.setText("You must log in to view your porfile");
+        titleTextView.setText("You must log in to view your profile");
         emailTextView.setText("");
         nameTextView.setText("");
         loginOrLogoutButton.setText("Log in ");

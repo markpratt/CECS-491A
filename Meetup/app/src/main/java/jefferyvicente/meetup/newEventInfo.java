@@ -74,7 +74,7 @@ public class newEventInfo extends Activity {
                 eventinfo.put("eventTime", time);
                 eventinfo.put("eventCreator",currentUser);
                 eventinfo.saveInBackground();
-                System.out.println("Saved in backgroud");
+                System.out.println("Saved in background");
 
                 Intent intent = new Intent(context, eventView.class);
                 startActivity(intent);

@@ -10,8 +10,15 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
 
+import com.parse.ParseUser;
 import com.parse.ParseObject;
 import com.parse.ParseQueryAdapter;
+import com.parse.ParseQuery;
+import com.parse.ParseException;
+import com.parse.FindCallback;
+import java.util.List;
+
+
 
 public class eventView extends Activity {
 
@@ -28,7 +35,20 @@ public class eventView extends Activity {
         toNewEventInfo();
 
 
-        mainAdapter = new ParseQueryAdapter<ParseObject>(this, "event");
+
+/*
+        // Create query to get all events where eventCreator matches current user's id.  Pass to ParseQueryAdapter
+        mainAdapter = new ParseQueryAdapter<ParseObject>(this, new ParseQueryAdapter.QueryFactory<ParseObject>()
+        {
+            public ParseQuery create()
+            {
+                ParseQuery<ParseObject> eventQuery = ParseQuery.getQuery("event");
+                eventQuery.whereEqualTo("eventCreator", ParseUser.getCurrentUser());
+                return eventQuery;
+            }
+        }); */
+
+        //mainAdapter = new ParseQueryAdapter<ParseObject>(this, "event");
         mainAdapter.setTextKey("eventName");
         //mainAdapter.setImageKey("image");
         //mainAdapter.setTextKey("eventDetails");
@@ -36,6 +56,7 @@ public class eventView extends Activity {
 
         // Initialize the subclass of ParseQueryAdapter
        //urgentTodosAdapter = new CustomAdapter(this);
+
 
         listView = (ListView) findViewById(R.id.event_listView);
         listView.setAdapter(mainAdapter);
