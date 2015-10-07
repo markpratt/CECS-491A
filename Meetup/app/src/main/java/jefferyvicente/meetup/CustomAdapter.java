@@ -3,14 +3,22 @@ package jefferyvicente.meetup;
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.app.Activity;
 
-import com.parse.ParseFile;
-import com.parse.ParseImageView;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseQueryAdapter;
 import com.parse.ParseUser;
+import android.widget.EditText;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
+import android.widget.Toast;
+import android.view.View;
 
 
 
@@ -22,6 +30,8 @@ public class CustomAdapter extends ParseQueryAdapter<ParseObject> {
         // Todos marked as high-pri
         super(context, new ParseQueryAdapter.QueryFactory<ParseObject>() {
             public ParseQuery create() {
+
+
                 ParseQuery query = new ParseQuery("event");
                 query.whereEqualTo("eventCreator", ParseUser.getCurrentUser());
                 //query.orderByAscending("createdAt");

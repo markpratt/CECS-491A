@@ -9,25 +9,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
-import com.parse.ParseObject;
-import com.parse.ParseQueryAdapter;
-import com.parse.Parse.*;
-import com.parse.ParseUser;
-import com.parse.ParseQuery;
-import com.parse.*;
-import com.parse.ParseException;
-import java.util.List;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.Toast;
-import java.util.regex.Pattern;
-import java.lang.Object;
-import java.io.*;
+
 
 import 	java.lang.String;
 
 public class friendManager extends Activity {
 
-
+    private friendManagerCustomAdapter adapter;
 
 
     @Override
@@ -39,12 +30,11 @@ public class friendManager extends Activity {
 
 
 
+
+
     }
 
     public void toFriendManger(){
-
-
-
 
         final Context context = this;
         Button button = (Button)findViewById(R.id.search_button);
@@ -52,19 +42,56 @@ public class friendManager extends Activity {
             @Override
             public void onClick(View arg0){
                 EditText editText = (EditText) findViewById(R.id.friendSeach_editText);
-                String searchfeild  = editText.getText().toString();
-                System.out.println(searchfeild);
-
+                //String searchfeild  = editText.getText().toString();
                 if(editText.getText().toString().trim().length()==0)
                 {
                     Toast.makeText(getApplicationContext(),
                             "Search Feild is Empty", Toast.LENGTH_LONG).show();
-                }
+                    ListView listView = (ListView) findViewById(R.id.friendManager_ListView);
+                    listView.setAdapter(null);
+                }else {
 
+                    querySearch();
+
+                }
 
 
             }
         });
+
+    }
+
+    public void querySearch(){
+        EditText editText = (EditText) findViewById(R.id.friendSeach_editText);
+        String searchfeild  = editText.getText().toString();
+        System.out.println(searchfeild);
+
+        /*
+
+        //Querying and database conncetion test
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("_User");
+        query.whereEqualTo("name", searchfeild);
+        query.getFirstInBackground(new GetCallback<ParseObject>() {
+            public void done(ParseObject object, ParseException e) {
+                if (object == null) {
+                    System.out.println("Query FAILED");
+                } else {
+                    System.out.println("Query Successful");
+                }
+            }
+        });
+
+        */
+
+
+
+        adapter = new friendManagerCustomAdapter(this,searchfeild);
+        //adapter.setTextKey("name");
+
+
+        ListView listView = (ListView) findViewById(R.id.friendManager_ListView);
+        listView.setAdapter(adapter);
+
 
     }
 

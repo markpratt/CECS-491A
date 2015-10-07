@@ -9,11 +9,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
+import android.support.v4.widget.DrawerLayout;
 
-import com.parse.ParseUser;
+import android.widget.ArrayAdapter;
+
+
 import com.parse.ParseObject;
 import com.parse.ParseQueryAdapter;
-
 import com.parse.Parse.*;
 import com.parse.ParseUser;
 import com.parse.ParseQuery;
@@ -22,13 +24,13 @@ import com.parse.*;
 import com.parse.ParseException;
 import java.util.List;
 
-
 public class eventView extends Activity {
 
     private ParseQueryAdapter<ParseObject> mainAdapter;
     //private CustomAdapter urgentTodosAdapter;
     private ListView listView;
     private CustomAdapter adapter2;
+
 
 
     @Override
@@ -68,15 +70,11 @@ public class eventView extends Activity {
                 new ParseQueryAdapter<ParseObject>(this,new ParseQueryAdapter.QueryFactory<ParseObject>(){
                     public ParseQuery<ParseObject> create() {
 
-
-
                         ParseQuery<ParseObject> eventQuery = ParseQuery.getQuery("event");
                         eventQuery.whereEqualTo("eventCreator", ParseUser.getCurrentUser());
 
 
-
                         eventQuery.findInBackground(new FindCallback<ParseObject>() {
-
 
                             public void done(List<ParseObject> objects, ParseException e) {
                                 if (e == null) {
