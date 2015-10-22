@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.support.v4.widget.DrawerLayout;
@@ -22,6 +23,8 @@ import com.parse.ParseQuery;
 //import java.text.ParseException;
 import com.parse.*;
 import com.parse.ParseException;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class eventView extends Activity {
@@ -30,7 +33,6 @@ public class eventView extends Activity {
     //private CustomAdapter urgentTodosAdapter;
     private ListView listView;
     private CustomAdapter adapter2;
-
 
 
     @Override
@@ -58,36 +60,22 @@ public class eventView extends Activity {
                 return query;
             }
         });
-
-
-
         //ParseQuery<ParseObject> query = ParseQuery.getQuery("event");
         //query.whereEqualTo("eventCreator", ParseUser.getCurrentUser());
-
-
-
         ParseQueryAdapter<ParseObject> adapter =
                 new ParseQueryAdapter<ParseObject>(this,new ParseQueryAdapter.QueryFactory<ParseObject>(){
                     public ParseQuery<ParseObject> create() {
-
                         ParseQuery<ParseObject> eventQuery = ParseQuery.getQuery("event");
                         eventQuery.whereEqualTo("eventCreator", ParseUser.getCurrentUser());
-
-
                         eventQuery.findInBackground(new FindCallback<ParseObject>() {
-
                             public void done(List<ParseObject> objects, ParseException e) {
                                 if (e == null) {
-
-
                                 }
                             }
                         });
                     return eventQuery;
                     }
-
                 });
-
           */
         adapter2 = new CustomAdapter(this);
         adapter2.setTextKey("eventName");
@@ -99,9 +87,46 @@ public class eventView extends Activity {
         ListView listView = (ListView) findViewById(R.id.event_listView);
         listView.setAdapter(adapter2);
 
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                /*
+                    Ideally, list of event objects would be obtained from CustomAdapter, and
+                    this list would be passed to EventDetails, where data could be extracted from
+                    the ParseObject.  However, intent.putExtra doesn't work if second arg is
+                    object, unless that object implements Parcelable.  I don't know how to redefine
+                    ParseObject to implement Parcelable.  Instead, I will get String lists from
+                    each event object and send those lists to EventDetails.  EventDetails will
+                    then have to query database to get event objects.
+                 */
+
+                // Get data for selected item from CustomAdapter
+                ArrayList<String> eventNames = adapter2.getEventNames();
+                ArrayList<String> eventDates = adapter2.getEventDates();
+                ArrayList<String> eventTimes = adapter2.getEventTimes();
+                ArrayList<String> eventAddresses = adapter2.getEventAddresses();
+                ArrayList<String> eventDetails = adapter2.getEventDetails();
+
+                String selectedName = eventNames.get(position);
+                String selectedDate = eventDates.get(position);
+                String selectedTime = eventTimes.get(position);
+                String selectedAddress = eventAddresses.get(position);
+                String selectedDetail = eventDetails.get(position);
+
+                Intent myIntent = new Intent(eventView.this, EventDetails.class);
+                // Pass event data to EventDetails
+                myIntent.putExtra("selectedName", selectedName);
+                myIntent.putExtra("selectedDate", selectedDate);
+                myIntent.putExtra("selectedTime", selectedTime);
+                myIntent.putExtra("selectedAddress", selectedAddress);
+                myIntent.putExtra("selectedDetail", selectedDetail);
+                eventView.this.startActivity(myIntent);
+
+            }
+        });
+
     }
-
-
 
 
     @Override

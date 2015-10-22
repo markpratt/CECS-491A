@@ -12,6 +12,7 @@ import android.widget.TextView;
 import android.content.Context;
 import android.content.Intent;
 
+import com.parse.ParseInstallation;
 import com.parse.ParseUser;
 import com.parse.ui.ParseLoginBuilder;
 
@@ -53,10 +54,12 @@ public class SampleActivity extends Activity {
                     currentUser = null;
                     showProfileLoggedOut();
                 } else {
+
                     // User clicked to log in.
                     ParseLoginBuilder loginBuilder = new ParseLoginBuilder(
                             SampleActivity.this);
                     startActivityForResult(loginBuilder.build(), LOGIN_REQUEST);
+
                 }
             }
         });
