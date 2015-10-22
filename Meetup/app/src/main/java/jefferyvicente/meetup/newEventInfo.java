@@ -8,16 +8,22 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ListView;
 
 
 import com.parse.Parse;
 import com.parse.*;
 
 import com.parse.ParseUser;
+
+import java.util.ArrayList;
+
 public class newEventInfo extends Activity {
 
-    Button button;
+    private Button button;
+    private NewEventCustomAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +31,12 @@ public class newEventInfo extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_event_info);
         getActionBar().hide();
+
+        // Set the ListView adapter
+        adapter = new NewEventCustomAdapter(this);
+        adapter.setTextKey("inviteeName");
+        ListView listView = (ListView) findViewById(R.id.invitee_listView);
+        listView.setAdapter(adapter);
 
         //createEvent();
         addListenerOnButton();
@@ -37,13 +49,11 @@ public class newEventInfo extends Activity {
         return true;
     }
 
-
     private void addListenerOnButton() {
 
         final Context context = this;
 
         button = (Button) findViewById(R.id.saveEvent_button);
-
 
         button.setOnClickListener(new View.OnClickListener() {
 
@@ -67,32 +77,36 @@ public class newEventInfo extends Activity {
                 ParseUser currentUser = ParseUser.getCurrentUser();
                 String currentUserString = ParseUser.getCurrentUser().getUsername();
 
-
-
                 ParseObject eventinfo = new ParseObject("event");
                 eventinfo.put("eventName", name);
                 eventinfo.put("eventDetails", details);
                 eventinfo.put("eventLocationAddress", location);
                 eventinfo.put("eventDate", date);
                 eventinfo.put("eventTime", time);
-                eventinfo.put("eventCreator",currentUser);
+                eventinfo.put("eventCreator", currentUser);
                 eventinfo.saveInBackground();
-                System.out.println("Saved in backgroud");
+                System.out.println("Saved in background");
                 System.out.println("Current User ID: " + currentUser);
                 System.out.println("Current User ID String:" + currentUserString);
 
+                // Get the names of the friends who were checked, send them a notification
+                ArrayList<String> inviteeList = adapter.getInviteeList();
+                if(inviteeList.isEmpty())
+                    System.out.println("inviteeList was empty");
+                for(String invitee : inviteeList)
+                {
+                    ParseQuery query = ParseInstallation.getQuery();
+                    query.whereEqualTo("name", invitee);
+                    ParsePush.sendMessageInBackground("You've been invited to a Meetup Event!", query);
+                }
 
+                // After new event created, go back to eventView
                 Intent intent = new Intent(context, eventView.class);
                 startActivity(intent);
-
-
             }
 
         });
-
     }
-
-
 
 
     private void createEvent(){
@@ -127,13 +141,12 @@ public class newEventInfo extends Activity {
                 eventinfo.saveInBackground();
 
 
-
                 //Intent intent = new Intent(context, newEventInfo.class);
                 //startActivity(intent);
             }
         });
-
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will

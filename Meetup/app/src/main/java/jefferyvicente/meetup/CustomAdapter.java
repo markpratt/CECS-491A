@@ -20,10 +20,16 @@ import android.widget.Toast;
 import android.widget.Toast;
 import android.view.View;
 
+import java.util.ArrayList;
 
 
-
-public class CustomAdapter extends ParseQueryAdapter<ParseObject> {
+public class CustomAdapter extends ParseQueryAdapter<ParseObject>
+{
+    private ArrayList<String> eventNames = new ArrayList<String>();
+    private ArrayList<String> eventDates = new ArrayList<String>();
+    private ArrayList<String> eventTimes = new ArrayList<String>();
+    private ArrayList<String> eventAddresses = new ArrayList<String>();
+    private ArrayList<String> eventDetails = new ArrayList<String>();
 
     public CustomAdapter(Context context) {
         // Use the QueryFactory to construct a PQA that will only show
@@ -52,6 +58,12 @@ public class CustomAdapter extends ParseQueryAdapter<ParseObject> {
 
         super.getItemView(object, v, parent);
 
+        eventNames.add(object.getString("eventName"));
+        eventDates.add(object.getString("eventDate"));
+        eventTimes.add(object.getString("eventTime"));
+        eventAddresses.add(object.getString("eventLocationAddress"));
+        eventDetails.add(object.getString("eventDetails"));
+
         //Add the title view to
         TextView titleTextView = (TextView) v.findViewById(R.id.eventName_textView);
         titleTextView.setText("Name: " + object.getString("eventName"));
@@ -62,9 +74,14 @@ public class CustomAdapter extends ParseQueryAdapter<ParseObject> {
 
         //Adds the location to the list view.
         TextView eventLocation = (TextView) v.findViewById(R.id.location_textView);
-        eventLocation.setText("Location: "+object.getString("eventLocationAddress"));
-
+        eventLocation.setText("Location: " + object.getString("eventLocationAddress"));
 
         return v;
     }
+
+    public ArrayList<String> getEventNames() {return eventNames;}
+    public ArrayList<String> getEventDates() {return eventDates;}
+    public ArrayList<String> getEventTimes() {return eventTimes;}
+    public ArrayList<String> getEventAddresses() {return eventAddresses;}
+    public ArrayList<String> getEventDetails() {return eventDetails;}
 }
