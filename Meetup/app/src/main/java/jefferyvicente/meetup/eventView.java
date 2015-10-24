@@ -96,31 +96,18 @@ public class eventView extends Activity {
                     this list would be passed to EventDetails, where data could be extracted from
                     the ParseObject.  However, intent.putExtra doesn't work if second arg is
                     object, unless that object implements Parcelable.  I don't know how to redefine
-                    ParseObject to implement Parcelable.  Instead, I will get String lists from
-                    each event object and send those lists to EventDetails.  EventDetails will
-                    then have to query database to get event objects.
+                    ParseObject to implement Parcelable.  Instead, I will get eventNames String list
+                    (and assume that each eventName is unique) and send that list to EventDetails.
+                    EventDetails will then have to query database to get event objects.
                  */
 
-                // Get data for selected item from CustomAdapter
+                // Get selected eventName from CustomAdapter
                 ArrayList<String> eventNames = adapter2.getEventNames();
-                ArrayList<String> eventDates = adapter2.getEventDates();
-                ArrayList<String> eventTimes = adapter2.getEventTimes();
-                ArrayList<String> eventAddresses = adapter2.getEventAddresses();
-                ArrayList<String> eventDetails = adapter2.getEventDetails();
-
                 String selectedName = eventNames.get(position);
-                String selectedDate = eventDates.get(position);
-                String selectedTime = eventTimes.get(position);
-                String selectedAddress = eventAddresses.get(position);
-                String selectedDetail = eventDetails.get(position);
 
-                Intent myIntent = new Intent(eventView.this, EventDetails.class);
                 // Pass event data to EventDetails
+                Intent myIntent = new Intent(eventView.this, EventDetails.class);
                 myIntent.putExtra("selectedName", selectedName);
-                myIntent.putExtra("selectedDate", selectedDate);
-                myIntent.putExtra("selectedTime", selectedTime);
-                myIntent.putExtra("selectedAddress", selectedAddress);
-                myIntent.putExtra("selectedDetail", selectedDetail);
                 eventView.this.startActivity(myIntent);
 
             }

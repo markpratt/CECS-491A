@@ -8,14 +8,24 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
+import com.parse.FindCallback;
+import com.parse.GetCallback;
+import com.parse.ParseException;
+import java.util.List;
+
 public class EventDetails extends Activity
 {
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_details);
+        getActionBar().hide();
 
-        // Get the data passed from eventView and populate this activity
+        // Get extras from eventView activity
         Bundle myInput = this.getIntent().getExtras();
         if(myInput == null)
             Log.d("debug", "Intent was null");
@@ -23,27 +33,36 @@ public class EventDetails extends Activity
         {
             Log.d("debug", "Intent was ok");
 
-            TextView ntv = (TextView) this.findViewById(R.id.name_TextView);
-            String eventName = myInput.getString("selectedName");
-            ntv.setText(eventName);
+            final TextView ntv = (TextView) this.findViewById(R.id.name_TextView);
+            final TextView dtv = (TextView) this.findViewById(R.id.details_TextView);
+            final TextView ltv = (TextView) this.findViewById(R.id.location_TextView);
+            final TextView datv = (TextView) this.findViewById(R.id.date_TextView);
+            final TextView ttv = (TextView) this.findViewById(R.id.time_TextView);
 
-            TextView dtv = (TextView) this.findViewById(R.id.details_TextView);
-            String eventDetails = myInput.getString("selectedDetail");
-            dtv.setText(eventDetails);
+            // Assume eventName is unique. Perform query to get other data for event and then set TextViews.
+            ParseQuery<ParseObject> query = ParseQuery.getQuery("event");
+            query.whereEqualTo("eventName", myInput.getString("selectedName"));
+            query.getFirstInBackground(new GetCallback<ParseObject>() {
+                public void done(ParseObject object, ParseException e) {
+                    if (object == null) {
+                        Log.d("event", "The getFirst request failed.");
+                    } else {
+                        Log.d("event", "Retrieved the object.");
 
-            TextView ltv = (TextView) this.findViewById(R.id.location_TextView);
-            String eventLocation = myInput.getString("selectedAddress");
-            ltv.setText(eventLocation);
+                        String eventName = object.getString("eventName");
+                        String eventDate = object.getString("eventDate");
+                        String eventTime = object.getString("eventTime");
+                        String eventDetails = object.getString("eventDetails");
+                        String eventLocationAddress = object.getString("eventLocationAddress");
 
-            TextView datv = (TextView) this.findViewById(R.id.date_TextView);
-            String eventDate = myInput.getString("selectedDate");
-            datv.setText(eventDate);
-
-            TextView ttv = (TextView) this.findViewById(R.id.time_TextView);
-            String eventTime = myInput.getString("selectedTime");
-            ttv.setText(eventTime);
-
-
+                        ntv.setText(eventName);
+                        datv.setText(eventDate);
+                        ttv.setText(eventTime);
+                        dtv.setText(eventDetails);
+                        ltv.setText(eventLocationAddress);
+                    }
+                }
+            });
 
         }
 
