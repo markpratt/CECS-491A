@@ -13,14 +13,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Event Name:"
+        android:text="Event Name"
         android:id="@+id/eventNameLabel"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true" />
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="35dp"
+        android:layout_height="48dp"
         android:ems="10"
         android:id="@+id/name_TextView"
         android:layout_below="@+id/eventNameLabel" />
@@ -29,14 +29,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Event Details:"
+        android:text="Event Details"
         android:id="@+id/eventDetailsLabel"
         android:layout_below="@+id/name_TextView"/>
 
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="45dp"
+        android:layout_height="48dp"
         android:id="@+id/details_TextView"
         android:layout_below="@+id/eventDetailsLabel"
         android:layout_alignParentStart="true" />
@@ -45,13 +45,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Event Location:"
+        android:text="Event Location"
         android:id="@+id/eventLocationLabel"
         android:layout_below="@+id/details_TextView"/>
 
     <TextView
         android:layout_width="fill_parent"
-        android:layout_height="35dp"
+        android:layout_height="48dp"
         android:ems="10"
         android:id="@+id/location_TextView"
         android:layout_below="@+id/eventLocationLabel"
@@ -61,13 +61,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Event Date:"
+        android:text="Event Date"
         android:id="@+id/eventDateLabel"
         android:layout_below="@+id/location_TextView"/>
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="35dp"
+        android:layout_height="48dp"
         android:ems="10"
         android:id="@+id/date_TextView"
         android:layout_below="@+id/eventDateLabel" />
@@ -76,13 +76,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Event Time:"
+        android:text="Event Time"
         android:id="@+id/eventTimeLabel"
         android:layout_below="@+id/date_TextView"/>
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="35dp"
+        android:layout_height="48dp"
         android:ems="10"
         android:id="@+id/time_TextView"
         android:layout_below="@+id/eventTimeLabel" />
@@ -91,7 +91,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Current Attendees:"
+        android:text="Current Attendees"
         android:id="@+id/attendeeLabel"
         android:layout_below="@+id/time_TextView" />
 
@@ -102,21 +102,25 @@
         android:layout_below="@+id/attendeeLabel"
         android:layout_alignParentStart="true" />
 
-    <Button
+    <!--As written, buttons below aren't visible.  Maybe try putting all elements in another ListView-->
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Accept Invite"
-        android:id="@+id/accept_invite_button"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true" />
+        android:layout_below="@+id/attendee_listView">
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Decline Invite"
-        android:id="@+id/decline_invite_button"
-        android:layout_alignTop="@+id/accept_invite_button"
-        android:layout_alignParentEnd="true" />
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Accept Invitation to This Event"
+            android:id="@+id/accept_invite_button" />
 
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Decline Invitation to This Event"
+            android:id="@+id/decline_invite_button" />
+
+    </LinearLayout>
 
 </RelativeLayout>
