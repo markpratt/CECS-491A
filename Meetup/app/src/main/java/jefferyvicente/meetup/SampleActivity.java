@@ -111,7 +111,7 @@ public class SampleActivity extends Activity {
      * Show a message asking the user to log in, toggle login/logout button text.
      */
     private void showProfileLoggedOut() {
-        titleTextView.setText("You must log in to view your porfile");
+        titleTextView.setText("You must log in to view your profile");
         emailTextView.setText("");
         nameTextView.setText("");
         loginOrLogoutButton.setText("Log in ");

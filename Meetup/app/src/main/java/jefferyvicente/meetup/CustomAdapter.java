@@ -26,17 +26,15 @@ import java.util.ArrayList;
 public class CustomAdapter extends ParseQueryAdapter<ParseObject>
 {
     private ArrayList<String> eventNames = new ArrayList<String>();
-    private ArrayList<String> eventDates = new ArrayList<String>();
+    /*private ArrayList<String> eventDates = new ArrayList<String>();
     private ArrayList<String> eventTimes = new ArrayList<String>();
     private ArrayList<String> eventAddresses = new ArrayList<String>();
-    private ArrayList<String> eventDetails = new ArrayList<String>();
+    private ArrayList<String> eventDetails = new ArrayList<String>();*/
 
     public CustomAdapter(Context context) {
-        // Use the QueryFactory to construct a PQA that will only show
-        // Todos marked as high-pri
+        // Use the QueryFactory to construct a PQA that will only show events created by current User
         super(context, new ParseQueryAdapter.QueryFactory<ParseObject>() {
             public ParseQuery create() {
-
 
                 ParseQuery query = new ParseQuery("event");
                 query.whereEqualTo("eventCreator", ParseUser.getCurrentUser());
@@ -47,7 +45,6 @@ public class CustomAdapter extends ParseQueryAdapter<ParseObject>
         });
     }
 
-
     @Override
     public View getItemView(ParseObject object, View v, ViewGroup parent)
     {
@@ -55,14 +52,13 @@ public class CustomAdapter extends ParseQueryAdapter<ParseObject>
             v = View.inflate(getContext(),R.layout.listview,null);
         }
 
-
         super.getItemView(object, v, parent);
 
         eventNames.add(object.getString("eventName"));
-        eventDates.add(object.getString("eventDate"));
+        /*eventDates.add(object.getString("eventDate"));
         eventTimes.add(object.getString("eventTime"));
         eventAddresses.add(object.getString("eventLocationAddress"));
-        eventDetails.add(object.getString("eventDetails"));
+        eventDetails.add(object.getString("eventDetails"));*/
 
         //Add the title view to
         TextView titleTextView = (TextView) v.findViewById(R.id.eventName_textView);
@@ -80,8 +76,8 @@ public class CustomAdapter extends ParseQueryAdapter<ParseObject>
     }
 
     public ArrayList<String> getEventNames() {return eventNames;}
-    public ArrayList<String> getEventDates() {return eventDates;}
+    /*public ArrayList<String> getEventDates() {return eventDates;}
     public ArrayList<String> getEventTimes() {return eventTimes;}
     public ArrayList<String> getEventAddresses() {return eventAddresses;}
-    public ArrayList<String> getEventDetails() {return eventDetails;}
+    public ArrayList<String> getEventDetails() {return eventDetails;}*/
 }
