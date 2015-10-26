@@ -27,13 +27,15 @@ public class SampleActivity extends Activity {
     private TextView emailTextView;
     private TextView nameTextView;
     private Button loginOrLogoutButton;
-    Button button;
+    Button continue_button;
 
     private ParseUser currentUser;
 
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
 
         //toEventView();
         getActionBar().hide();
@@ -43,7 +45,7 @@ public class SampleActivity extends Activity {
         nameTextView = (TextView) findViewById(R.id.profile_name);
         loginOrLogoutButton = (Button) findViewById(R.id.login_or_logout_button);
         titleTextView.setText("You are logged in as");
-        button = (Button)findViewById(R.id.continue_button);
+        continue_button = (Button)findViewById(R.id.continue_button);
         toEventView();
         loginOrLogoutButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -71,6 +73,21 @@ public class SampleActivity extends Activity {
 
         currentUser = ParseUser.getCurrentUser();
         if (currentUser != null) {
+        /*
+            - Save installation data for push notifications.
+            -
+            Ideally, installation info would be saved once on signup.  As written, info may be saved
+            every time Meetup runs.  However, Parse docs say that ParseInstallation is smart, and
+            doesn't save if no change has been made to record, so current strategy may be ok.
+            Maybe try later:  import other activities from ParseUILogin, modify SignUpFragment and
+            try to get this app to to use the modified version.
+        */
+            ParseUser currentUser = ParseUser.getCurrentUser();
+            ParseInstallation installation = ParseInstallation.getCurrentInstallation();
+            installation.put("name", currentUser.getString("name"));
+            installation.put("email", currentUser.getEmail());
+            installation.saveInBackground();
+
             showProfileLoggedIn();
         } else {
             showProfileLoggedOut();
@@ -81,8 +98,9 @@ public class SampleActivity extends Activity {
      * Shows the profile of the given user.
      */
     private void showProfileLoggedIn() {
-        View hideButton = findViewById(R.id.continue_button);
-        hideButton.setVisibility(View.VISIBLE);
+        // Necessary to have 2 references to continue button? I (Mark) consolidated into continue_button.
+        //View hideButton = findViewById(R.id.continue_button);
+        continue_button.setVisibility(View.VISIBLE);
 
         titleTextView.setText("You are logged in as ");
         emailTextView.setText(currentUser.getEmail());
@@ -97,7 +115,7 @@ public class SampleActivity extends Activity {
 
         final Context context = this;
         //button = (Button)findViewById(R.id.continue_button);
-        button.setOnClickListener(new View.OnClickListener(){
+        continue_button.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View arg0){
                 Intent intent = new Intent(context, eventView.class);
@@ -111,6 +129,8 @@ public class SampleActivity extends Activity {
      * Show a message asking the user to log in, toggle login/logout button text.
      */
     private void showProfileLoggedOut() {
+        // User shouldn't be able to see continue button if they're not logged in.
+        continue_button.setVisibility(View.GONE);
         titleTextView.setText("You must log in to view your profile");
         emailTextView.setText("");
         nameTextView.setText("");

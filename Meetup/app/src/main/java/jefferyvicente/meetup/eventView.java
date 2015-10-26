@@ -98,7 +98,7 @@ public class eventView extends Activity {
                     object, unless that object implements Parcelable.  I don't know how to redefine
                     ParseObject to implement Parcelable.  Instead, I will get eventNames String list
                     (and assume that each eventName is unique) and send that list to EventDetails.
-                    EventDetails will then have to query database to get event objects.
+                    EventDetails will then have to query database to get event data.
                  */
 
                 // Get selected eventName from CustomAdapter

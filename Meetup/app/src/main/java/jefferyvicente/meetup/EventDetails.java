@@ -2,22 +2,29 @@ package jefferyvicente.meetup;
 
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RadioButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseRelation;
 import com.parse.ParseUser;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import java.util.List;
 
-public class EventDetails extends Activity
-{
+public class EventDetails extends Activity {
+    private EventDetailsCustomAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,12 +32,11 @@ public class EventDetails extends Activity
         setContentView(R.layout.activity_event_details);
         getActionBar().hide();
 
-        // Get extras from eventView activity
+        // Get extras from eventView or EventsInvitedTo activity
         Bundle myInput = this.getIntent().getExtras();
-        if(myInput == null)
+        if (myInput == null)
             Log.d("debug", "Intent was null");
-        else
-        {
+        else {
             Log.d("debug", "Intent was ok");
 
             final TextView ntv = (TextView) this.findViewById(R.id.name_TextView);
@@ -39,11 +45,13 @@ public class EventDetails extends Activity
             final TextView datv = (TextView) this.findViewById(R.id.date_TextView);
             final TextView ttv = (TextView) this.findViewById(R.id.time_TextView);
 
-            // Assume eventName is unique. Perform query to get other data for event and then set TextViews.
+            /*  Assume eventName is unique. Perform query to get other data for event and then set
+                TextViews, ListView, and Buttons.
+             */
             ParseQuery<ParseObject> query = ParseQuery.getQuery("event");
             query.whereEqualTo("eventName", myInput.getString("selectedName"));
             query.getFirstInBackground(new GetCallback<ParseObject>() {
-                public void done(ParseObject object, ParseException e) {
+                public void done(final ParseObject object, ParseException e) {
                     if (object == null) {
                         Log.d("event", "The getFirst request failed.");
                     } else {
@@ -54,17 +62,45 @@ public class EventDetails extends Activity
                         String eventTime = object.getString("eventTime");
                         String eventDetails = object.getString("eventDetails");
                         String eventLocationAddress = object.getString("eventLocationAddress");
-
                         ntv.setText(eventName);
                         datv.setText(eventDate);
                         ttv.setText(eventTime);
                         dtv.setText(eventDetails);
                         ltv.setText(eventLocationAddress);
+
+                        // Set the ListView adapter
+                        adapter = new EventDetailsCustomAdapter(EventDetails.this, object);
+                        ListView listView = (ListView) findViewById(R.id.attendee_listView);
+                        listView.setAdapter(adapter);
+
+                        Button accept_button = (Button) findViewById(R.id.accept_invite_button);
+                        accept_button.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View arg0) {
+                                // Get current user and add to attendees relation of event class
+                                ParseRelation<ParseUser> relation = object.getRelation("attendees");
+                                relation.add(ParseUser.getCurrentUser());
+                                object.saveInBackground();
+                                // Go to eventView
+                                Intent intent = new Intent(EventDetails.this, eventView.class);
+                                startActivity(intent);
+                            }
+                        });
+
+                        Button decline_button = (Button) findViewById(R.id.decline_invite_button);
+                        decline_button.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View arg0) {
+                                // Go to eventView
+                                Intent intent = new Intent(EventDetails.this, eventView.class);
+                                startActivity(intent);
+                            }
+                        });
                     }
                 }
             });
 
         }
-
     }
 }
+

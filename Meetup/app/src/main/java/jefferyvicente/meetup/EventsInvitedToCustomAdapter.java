@@ -1,3 +1,4 @@
+
 package jefferyvicente.meetup;
 
 import android.content.Context;
@@ -23,19 +24,17 @@ import android.view.View;
 import java.util.ArrayList;
 
 
-public class CustomAdapter extends ParseQueryAdapter<ParseObject>
+public class EventsInvitedToCustomAdapter extends ParseQueryAdapter<ParseObject>
 {
     private ArrayList<String> eventNames = new ArrayList<String>();
 
-    public CustomAdapter(Context context) {
-        // Use the QueryFactory to construct a PQA that will only show events created by current User
+    public EventsInvitedToCustomAdapter(Context context) {
+
         super(context, new ParseQueryAdapter.QueryFactory<ParseObject>() {
             public ParseQuery create() {
 
-                ParseQuery query = new ParseQuery("event");
-                query.whereEqualTo("eventCreator", ParseUser.getCurrentUser());
-                //query.orderByAscending("createdAt");
-                query.orderByDescending("createdAt");
+                ParseQuery<ParseObject> query = ParseQuery.getQuery("event");
+                query.whereEqualTo("invitees", ParseUser.getCurrentUser());
                 return query;
             }
         });
@@ -52,15 +51,12 @@ public class CustomAdapter extends ParseQueryAdapter<ParseObject>
 
         eventNames.add(object.getString("eventName"));
 
-        //Add the title view to
         TextView titleTextView = (TextView) v.findViewById(R.id.eventName_textView);
         titleTextView.setText("Name: " + object.getString("eventName"));
 
-        //Adds the time where the object was created.
         TextView eventTime = (TextView) v.findViewById(R.id.date_textView);
         eventTime.setText("Date: " + object.getString("eventDate") + " at " + object.getString("eventTime"));
 
-        //Adds the location to the list view.
         TextView eventLocation = (TextView) v.findViewById(R.id.location_textView);
         eventLocation.setText("Location: " + object.getString("eventLocationAddress"));
 

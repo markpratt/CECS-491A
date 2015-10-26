@@ -20,7 +20,7 @@ public class MyPushBroadcastReceiver extends ParsePushBroadcastReceiver
         Class<? extends Activity> cls = null;
         try
         {
-            cls = (Class <? extends Activity>)Class.forName("jefferyvicente.meetup.EventDetails");
+            cls = (Class <? extends Activity>)Class.forName("jefferyvicente.meetup.EventsInvitedTo");
         }
         catch (ClassNotFoundException e)
         {

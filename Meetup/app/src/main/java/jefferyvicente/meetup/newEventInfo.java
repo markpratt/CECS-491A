@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,11 +20,14 @@ import com.parse.*;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class newEventInfo extends Activity {
 
     private Button button;
     private NewEventCustomAdapter adapter;
+    private ParseObject eventinfo;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,28 +81,59 @@ public class newEventInfo extends Activity {
                 ParseUser currentUser = ParseUser.getCurrentUser();
                 String currentUserString = ParseUser.getCurrentUser().getUsername();
 
-                ParseObject eventinfo = new ParseObject("event");
+                eventinfo = new ParseObject("event");
                 eventinfo.put("eventName", name);
                 eventinfo.put("eventDetails", details);
                 eventinfo.put("eventLocationAddress", location);
                 eventinfo.put("eventDate", date);
                 eventinfo.put("eventTime", time);
                 eventinfo.put("eventCreator", currentUser);
-                eventinfo.saveInBackground();
+                // Get current user and add to invitees relation of event class
+                ParseRelation<ParseUser> relation = eventinfo.getRelation("invitees");
+                relation.add(ParseUser.getCurrentUser());
+
                 System.out.println("Saved in background");
                 System.out.println("Current User ID: " + currentUser);
                 System.out.println("Current User ID String:" + currentUserString);
 
-                // Get the names of the friends who were checked, send them a notification
+                // Get the names of the friends who were checked
                 ArrayList<String> inviteeList = adapter.getInviteeList();
                 if(inviteeList.isEmpty())
                     System.out.println("inviteeList was empty");
+
                 for(String invitee : inviteeList)
                 {
-                    ParseQuery query = ParseInstallation.getQuery();
+                    /*  Get User objects of friends who were selected, add them to relation.
+                     When friendslist is added, query below should be changed to
+
+                     */
+                    ParseQuery<ParseUser> query = ParseUser.getQuery();
                     query.whereEqualTo("name", invitee);
-                    ParsePush.sendMessageInBackground("You've been invited to a Meetup Event!", query);
+                    try
+                    {
+                        /*  Normally, query.getFirstInBackground would be used, but we want query to
+                            finish before saveInBackground */
+                        ParseUser user = (ParseUser) query.getFirst();
+                        relation.add(user);
+                    }
+                    catch(ParseException e)
+                    {
+                        System.out.println("Query didn't work");
+                    }
+
+                    // Send each invitee a push notification
+                    ParseQuery query2 = ParseInstallation.getQuery();
+                    query2.whereEqualTo("name", invitee);
+                    ParsePush.sendMessageInBackground("You've been invited to a Meetup Event!", query2);
                 }
+
+                // Send myself a push notification *******(testing only -- remove for demo)**********
+                ParseQuery query3 = ParseInstallation.getQuery();
+                query3.whereEqualTo("name", ParseUser.getCurrentUser().getString("name"));
+                ParsePush.sendMessageInBackground("You've been invited to a Meetup Event!", query3);
+
+                // Save collected data to event class
+                eventinfo.saveInBackground();
 
                 // After new event created, go back to eventView
                 Intent intent = new Intent(context, eventView.class);

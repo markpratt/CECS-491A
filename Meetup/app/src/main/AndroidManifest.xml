@@ -64,8 +64,12 @@
             android:label="@string/title_activity_friend_manager" >
         </activity>
         <activity
-            android:name="EventDetails"
+            android:name=".EventDetails"
             android:label="@string/title_activity_event_details" >
+        </activity>
+        <activity
+            android:name=".EventsInvitedTo"
+            android:label="@string/title_activity_event_invited" >
         </activity>
 
         <service android:name="com.parse.PushService" />

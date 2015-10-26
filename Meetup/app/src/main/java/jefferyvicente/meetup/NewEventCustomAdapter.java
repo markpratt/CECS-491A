@@ -33,6 +33,13 @@ public class NewEventCustomAdapter extends ParseQueryAdapter<ParseObject> {
                     is done, change query to return all friends associated with this User. */
                 ParseQuery query = ParseUser.getQuery();
                 return query;
+                /*
+                    ParseUser user = new ParseUser();
+                    ParseRelation relation = user.getRelation("friends");
+                    ParseQuery query = relation.getQuery();
+                    return query;
+                 */
+
             }
         });
     }
@@ -47,7 +54,7 @@ public class NewEventCustomAdapter extends ParseQueryAdapter<ParseObject> {
 
         super.getItemView(object, v, parent);
 
-        // If box is checked, add name to ArrayList
+        // If box is checked, add name to ArrayList; if not, remove
         final CheckBox checkBox = (CheckBox) v.findViewById(R.id.invitee_checkBox);
         checkBox.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -61,6 +68,7 @@ public class NewEventCustomAdapter extends ParseQueryAdapter<ParseObject> {
                     inviteeList.remove(object.getString("name"));
             }
         });
+
 
         // Add the User's name to ListView
         TextView nameTextView = (TextView) v.findViewById(R.id.invitee_name);
