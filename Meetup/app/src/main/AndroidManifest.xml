@@ -71,6 +71,10 @@
             android:name=".EventsInvitedTo"
             android:label="@string/title_activity_event_invited" >
         </activity>
+        <activity
+            android:name=".EventsAttending"
+            android:label="@string/title_activity_event_attending" >
+        </activity>
 
         <service android:name="com.parse.PushService" />
         <receiver android:name="jefferyvicente.meetup.MyPushBroadcastReceiver"

@@ -77,10 +77,16 @@ public class EventDetails extends Activity {
                         accept_button.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View arg0) {
-                                // Get current user and add to attendees relation of event class
-                                ParseRelation<ParseUser> relation = object.getRelation("attendees");
-                                relation.add(ParseUser.getCurrentUser());
+
+                                // Add current user to attendees relation of event class
+                                ParseRelation<ParseUser> att_relation = object.getRelation("attendees");
+                                att_relation.add(ParseUser.getCurrentUser());
+
+                                // Remove current user from invitees relation of event class
+                                ParseRelation<ParseUser> inv_relation = object.getRelation("invitees");
+                                inv_relation.remove(ParseUser.getCurrentUser());
                                 object.saveInBackground();
+
                                 // Go to eventView
                                 Intent intent = new Intent(EventDetails.this, eventView.class);
                                 startActivity(intent);
@@ -91,6 +97,12 @@ public class EventDetails extends Activity {
                         decline_button.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View arg0) {
+
+                                // Remove current user from invitees relation of event class
+                                ParseRelation<ParseUser> inv_relation = object.getRelation("invitees");
+                                inv_relation.remove(ParseUser.getCurrentUser());
+                                object.saveInBackground();
+
                                 // Go to eventView
                                 Intent intent = new Intent(EventDetails.this, eventView.class);
                                 startActivity(intent);

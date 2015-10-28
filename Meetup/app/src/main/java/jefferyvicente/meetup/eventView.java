@@ -42,6 +42,8 @@ public class eventView extends Activity {
         getActionBar().hide();
         toNewEventInfo();
         toFriendManger();
+        toEventsInvitedTo();
+        toEventsAttending();
         final ParseUser currentUser = ParseUser.getCurrentUser();
 
         Intent i = getIntent();
@@ -153,14 +155,42 @@ public class eventView extends Activity {
 
     }
 
-    public void toFriendManger(){
+    public void toFriendManger() {
 
         final Context context = this;
-        Button button = (Button)findViewById(R.id.friendManageButton);
+        Button button = (Button) findViewById(R.id.friendManageButton);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                Intent intent = new Intent(context, friendManager.class);
+                startActivity(intent);
+            }
+        });
+
+    }
+
+    public void toEventsInvitedTo(){
+
+        final Context context = this;
+        Button button = (Button)findViewById(R.id.invitedToButton);
         button.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View arg0){
-                Intent intent = new Intent(context, friendManager.class);
+                Intent intent = new Intent(context, EventsInvitedTo.class);
+                startActivity(intent);
+            }
+        });
+
+    }
+
+    public void toEventsAttending(){
+
+        final Context context = this;
+        Button button = (Button)findViewById(R.id.attendingButton);
+        button.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View arg0){
+                Intent intent = new Intent(context, EventsAttending.class);
                 startActivity(intent);
             }
         });

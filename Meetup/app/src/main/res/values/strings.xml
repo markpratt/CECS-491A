@@ -8,6 +8,7 @@
     <string name="title_activity_friend_manager">friendManager</string>
     <string name="title_activity_event_details">EventDetails</string>
     <string name="title_activity_event_invited">EventsInvitedTo</string>
+    <string name="title_activity_event_attending">EventsAttending</string>
     <string name="title_activity_test">Test</string>
 
     <string name="title_section1">Section 1</string>
