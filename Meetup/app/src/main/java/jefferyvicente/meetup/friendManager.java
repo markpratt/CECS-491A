@@ -1,12 +1,15 @@
 package jefferyvicente.meetup;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 
 import android.widget.EditText;
@@ -14,11 +17,21 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 
+import com.parse.GetCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+import com.parse.ParseRelation;
+import com.parse.ParseUser;
+
 import 	java.lang.String;
+import java.util.ArrayList;
 
 public class friendManager extends Activity {
 
     private friendManagerCustomAdapter adapter;
+    final Context context = this;
+
 
 
     @Override
@@ -38,18 +51,17 @@ public class friendManager extends Activity {
 
         final Context context = this;
         Button button = (Button)findViewById(R.id.search_button);
-        button.setOnClickListener(new View.OnClickListener(){
+        button.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View arg0){
+            public void onClick(View arg0) {
                 EditText editText = (EditText) findViewById(R.id.friendSeach_editText);
                 //String searchfeild  = editText.getText().toString();
-                if(editText.getText().toString().trim().length()==0)
-                {
+                if (editText.getText().toString().trim().length() == 0) {
                     Toast.makeText(getApplicationContext(),
                             "Search Feild is Empty", Toast.LENGTH_LONG).show();
                     ListView listView = (ListView) findViewById(R.id.friendManager_ListView);
                     listView.setAdapter(null);
-                }else {
+                } else {
 
                     querySearch();
 
@@ -60,6 +72,7 @@ public class friendManager extends Activity {
         });
 
     }
+
 
     public void querySearch(){
         EditText editText = (EditText) findViewById(R.id.friendSeach_editText);
@@ -88,13 +101,98 @@ public class friendManager extends Activity {
         adapter = new friendManagerCustomAdapter(this,searchfeild);
         //adapter.setTextKey("name");
 
-
         ListView listView = (ListView) findViewById(R.id.friendManager_ListView);
         listView.setAdapter(adapter);
 
 
-    }
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
+                /*
+                    Ideally, list of event objects would be obtained from CustomAdapter, and
+                    this list would be passed to EventDetails, where data could be extracted from
+                    the ParseObject.  However, intent.putExtra doesn't work if second arg is
+                    object, unless that object implements Parcelable.  I don't know how to redefine
+                    ParseObject to implement Parcelable.  Instead, I will get eventNames String list
+                    (and assume that each eventName is unique) and send that list to EventDetails.
+                    EventDetails will then have to query database to get event data.
+                 */
+
+                // Get selected eventName from CustomAdapter
+                ArrayList<ParseObject> friendID = adapter.getFriendID();
+                final ParseObject selectedFriendId = friendID.get(position);
+
+                ArrayList<String> friendName = adapter.getFriendName();
+                String selectedfriendName = friendName.get(position);
+
+
+                //My test cases to validate
+                System.out.println(position);
+                System.out.println(selectedFriendId);
+                System.out.println(ParseUser.getCurrentUser());
+                System.out.println(selectedfriendName);
+
+
+                final ParseUser currentUser = ParseUser.getCurrentUser();
+
+
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+
+                alertDialogBuilder.setTitle("Confirm");
+
+                alertDialogBuilder.setMessage("Do you want to be friends with " + selectedfriendName).setCancelable(false)
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                System.out.println("Yes is pressed!!");
+
+
+                                ParseQuery<ParseObject> query = ParseQuery.getQuery("_User");
+                                query.whereEqualTo("username", currentUser.getUsername());
+                                query.getFirstInBackground(new GetCallback<ParseObject>() {
+                                    public void done(final ParseObject object, ParseException e) {
+                                        if (object == null) {
+                                            System.out.println("Failed");
+                                        } else {
+                                            System.out.println("Pass");
+
+                                            ParseRelation<ParseObject> relation = object.getRelation("friends");
+                                            relation.add(selectedFriendId);
+                                            object.saveInBackground();
+
+                                        }
+                                    }
+                                });
+
+                            }
+                        })
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                System.out.println("No is pressed!!");
+
+                            }
+                        });
+
+                AlertDialog alertDialog = alertDialogBuilder.create();
+
+                alertDialog.show();
+
+
+                /*
+                // Pass event data to EventDetails
+                Intent myIntent = new Intent(eventView.this, EventDetails.class);
+                myIntent.putExtra("selectedName", selectedName);
+                eventView.this.startActivity(myIntent);
+                */
+            }
+        });
+
+
+
+
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
