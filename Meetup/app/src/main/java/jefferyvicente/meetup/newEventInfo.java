@@ -88,9 +88,6 @@ public class newEventInfo extends Activity {
                 eventinfo.put("eventDate", date);
                 eventinfo.put("eventTime", time);
                 eventinfo.put("eventCreator", currentUser);
-                // Get current user and add to invitees relation of event class
-                ParseRelation<ParseUser> relation = eventinfo.getRelation("invitees");
-                relation.add(ParseUser.getCurrentUser());
 
                 System.out.println("Saved in background");
                 System.out.println("Current User ID: " + currentUser);
@@ -101,9 +98,10 @@ public class newEventInfo extends Activity {
                 if(inviteeList.isEmpty())
                     System.out.println("inviteeList was empty");
 
+                // Add friends who were checked to invitees relation, send them a notification
+                ParseRelation<ParseUser> inv_relation = eventinfo.getRelation("invitees");
                 for(String invitee : inviteeList)
                 {
-                    //  Get User objects of friends who were selected, add them to relation.
                     ParseQuery<ParseUser> query = ParseUser.getQuery();
                     query.whereEqualTo("name", invitee);
                     try
@@ -111,7 +109,7 @@ public class newEventInfo extends Activity {
                         /*  Normally, query.getFirstInBackground would be used, but we want query to
                             finish before saveInBackground */
                         ParseUser user = (ParseUser) query.getFirst();
-                        relation.add(user);
+                        inv_relation.add(user);
                     }
                     catch(ParseException e)
                     {
@@ -123,6 +121,10 @@ public class newEventInfo extends Activity {
                     query2.whereEqualTo("name", invitee);
                     ParsePush.sendMessageInBackground("You've been invited to a Meetup Event!", query2);
                 }
+
+                // Add current user (the event creator) to attendees list
+                ParseRelation<ParseUser> att_relation = eventinfo.getRelation("attendees");
+                att_relation.add(ParseUser.getCurrentUser());
 
                 // Save collected data to event class
                 eventinfo.saveInBackground();
