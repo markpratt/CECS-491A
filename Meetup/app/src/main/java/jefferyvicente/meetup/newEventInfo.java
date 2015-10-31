@@ -103,10 +103,7 @@ public class newEventInfo extends Activity {
 
                 for(String invitee : inviteeList)
                 {
-                    /*  Get User objects of friends who were selected, add them to relation.
-                     When friendslist is added, query below should be changed to
-
-                     */
+                    //  Get User objects of friends who were selected, add them to relation.
                     ParseQuery<ParseUser> query = ParseUser.getQuery();
                     query.whereEqualTo("name", invitee);
                     try
@@ -126,11 +123,6 @@ public class newEventInfo extends Activity {
                     query2.whereEqualTo("name", invitee);
                     ParsePush.sendMessageInBackground("You've been invited to a Meetup Event!", query2);
                 }
-
-                // Send myself a push notification *******(testing only -- remove for demo)**********
-                ParseQuery query3 = ParseInstallation.getQuery();
-                query3.whereEqualTo("name", ParseUser.getCurrentUser().getString("name"));
-                ParsePush.sendMessageInBackground("You've been invited to a Meetup Event!", query3);
 
                 // Save collected data to event class
                 eventinfo.saveInBackground();

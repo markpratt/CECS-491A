@@ -74,6 +74,25 @@ public class EventDetails extends Activity {
                         listView.setAdapter(adapter);
 
                         Button accept_button = (Button) findViewById(R.id.accept_invite_button);
+                        Button decline_button = (Button) findViewById(R.id.decline_invite_button);
+
+                        //  Set buttons to visible only if current User is on the invitee list
+                        ParseQuery inv_query = object.getRelation("invitees").getQuery();
+                        inv_query.whereEqualTo("name", ParseUser.getCurrentUser().getString("name"));
+                        try
+                        {
+                            if(!inv_query.find().isEmpty())
+                            {
+                                accept_button.setVisibility(View.VISIBLE);
+                                decline_button.setVisibility(View.VISIBLE);
+                            }
+                        }
+                        catch(ParseException ex)
+                        {
+                            System.out.println("Query didn't work");
+                            ex.printStackTrace();
+                        }
+
                         accept_button.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View arg0) {
@@ -93,7 +112,6 @@ public class EventDetails extends Activity {
                             }
                         });
 
-                        Button decline_button = (Button) findViewById(R.id.decline_invite_button);
                         decline_button.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View arg0) {
