@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseQueryAdapter;
+import com.parse.ParseRelation;
 import com.parse.ParseUser;
 import android.widget.Button;
 import android.view.LayoutInflater;
@@ -31,7 +32,12 @@ public class NewEventCustomAdapter extends ParseQueryAdapter<ParseObject> {
 
                 /*  As written, query returns all the Users.  After friends class and add to friends
                     is done, change query to return all friends associated with this User. */
-                ParseQuery query = ParseUser.getQuery();
+                //ParseQuery query = ParseUser.getQuery();
+                //return query;
+
+                final ParseUser currentUser = ParseUser.getCurrentUser();
+                ParseRelation relation = currentUser.getRelation("friends");
+                ParseQuery query =relation.getQuery();
                 return query;
                 /*
                     ParseUser user = new ParseUser();

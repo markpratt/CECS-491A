@@ -19,12 +19,13 @@ import android.view.LayoutInflater;
 import android.app.Activity;
 import android.content.Context;
 
-
-
-
+import java.util.ArrayList;
 
 
 public class friendManagerCustomAdapter extends ParseQueryAdapter<ParseObject> {
+
+    private ArrayList<ParseObject> friendID = new ArrayList<ParseObject>();
+    private ArrayList<String> friendname = new ArrayList<String>();
 
     public friendManagerCustomAdapter(Context context, final String friendSearch) {
 
@@ -52,6 +53,9 @@ public class friendManagerCustomAdapter extends ParseQueryAdapter<ParseObject> {
 
         super.getItemView(object, v, parent);
 
+        friendID.add(object);
+        friendname.add(object.getString("name"));
+
         //Add the title view to
         TextView titleTextView = (TextView) v.findViewById(R.id.name_textView);
         titleTextView.setText("Name: " + object.getString("name"));
@@ -66,5 +70,17 @@ public class friendManagerCustomAdapter extends ParseQueryAdapter<ParseObject> {
         return v;
     }
 
+
+    public ArrayList<ParseObject> getFriendID()
+    {
+        return friendID;
+
+    }
+
+    public ArrayList<String> getFriendName()
+    {
+        return friendname;
+
+    }
 
 }
