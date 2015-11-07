@@ -20,6 +20,8 @@ import static org.hamcrest.CoreMatchers.not;
 
 public class FriendManagerTest extends ActivityInstrumentationTestCase2<friendManager> {
 
+    public static final String USER_NAME = "John";
+    public static final String GREETING_MESSAGE = "Hello " + USER_NAME + "!";
 
     public FriendManagerTest() {
         super(friendManager.class);
