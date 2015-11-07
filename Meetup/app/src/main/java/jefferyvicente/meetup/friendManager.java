@@ -109,23 +109,12 @@ public class friendManager extends Activity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                /*
-                    Ideally, list of event objects would be obtained from CustomAdapter, and
-                    this list would be passed to EventDetails, where data could be extracted from
-                    the ParseObject.  However, intent.putExtra doesn't work if second arg is
-                    object, unless that object implements Parcelable.  I don't know how to redefine
-                    ParseObject to implement Parcelable.  Instead, I will get eventNames String list
-                    (and assume that each eventName is unique) and send that list to EventDetails.
-                    EventDetails will then have to query database to get event data.
-                 */
-
-                // Get selected eventName from CustomAdapter
+                // Get selected name from friendManagerCustomAdapter
                 ArrayList<ParseObject> friendID = adapter.getFriendID();
                 final ParseObject selectedFriendId = friendID.get(position);
 
                 ArrayList<String> friendName = adapter.getFriendName();
                 String selectedfriendName = friendName.get(position);
-
 
                 //My test cases to validate
                 System.out.println(position);
@@ -133,9 +122,7 @@ public class friendManager extends Activity {
                 System.out.println(ParseUser.getCurrentUser());
                 System.out.println(selectedfriendName);
 
-
                 final ParseUser currentUser = ParseUser.getCurrentUser();
-
 
                 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
 
@@ -179,18 +166,8 @@ public class friendManager extends Activity {
 
                 alertDialog.show();
 
-
-                /*
-                // Pass event data to EventDetails
-                Intent myIntent = new Intent(eventView.this, EventDetails.class);
-                myIntent.putExtra("selectedName", selectedName);
-                eventView.this.startActivity(myIntent);
-                */
             }
         });
-
-
-
 
     }
 

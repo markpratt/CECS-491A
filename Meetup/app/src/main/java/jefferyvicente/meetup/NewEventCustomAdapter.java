@@ -29,23 +29,11 @@ public class NewEventCustomAdapter extends ParseQueryAdapter<ParseObject> {
 
         super(context, new ParseQueryAdapter.QueryFactory<ParseObject>() {
             public ParseQuery create() {
-
-                /*  As written, query returns all the Users.  After friends class and add to friends
-                    is done, change query to return all friends associated with this User. */
-                //ParseQuery query = ParseUser.getQuery();
-                //return query;
-
+                // Get all the friends associated with current User
                 final ParseUser currentUser = ParseUser.getCurrentUser();
                 ParseRelation relation = currentUser.getRelation("friends");
                 ParseQuery query =relation.getQuery();
                 return query;
-                /*
-                    ParseUser user = new ParseUser();
-                    ParseRelation relation = user.getRelation("friends");
-                    ParseQuery query = relation.getQuery();
-                    return query;
-                 */
-
             }
         });
     }
