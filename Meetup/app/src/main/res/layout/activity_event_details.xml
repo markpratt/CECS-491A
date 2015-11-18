@@ -120,5 +120,15 @@
         android:layout_alignParentEnd="true"
         android:visibility="gone"/>
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="View Map"
+        android:id="@+id/view_map_button"
+        android:layout_above="@+id/accept_invite_button"
+        android:layout_alignTop="@+id/accept_invite_button"
+        android:layout_alignParentEnd="true"
+        android:visibility="gone"/>
+
 
 </RelativeLayout>

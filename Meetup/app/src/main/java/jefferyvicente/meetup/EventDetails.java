@@ -25,6 +25,7 @@ import java.util.List;
 
 public class EventDetails extends Activity {
     private EventDetailsCustomAdapter adapter;
+    private String eventName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +58,7 @@ public class EventDetails extends Activity {
                     } else {
                         Log.d("event", "Retrieved the object.");
 
-                        String eventName = object.getString("eventName");
+                        eventName = object.getString("eventName");
                         String eventDate = object.getString("eventDate");
                         String eventTime = object.getString("eventTime");
                         String eventDetails = object.getString("eventDetails");
@@ -75,8 +76,9 @@ public class EventDetails extends Activity {
 
                         Button accept_button = (Button) findViewById(R.id.accept_invite_button);
                         Button decline_button = (Button) findViewById(R.id.decline_invite_button);
+                        Button map_button = (Button) findViewById(R.id.view_map_button);
 
-                        //  Set buttons to visible only if current User is on the invitee list
+                        //  Set accept/decline buttons to visible only if current User is on the invitee list
                         ParseQuery inv_query = object.getRelation("invitees").getQuery();
                         inv_query.whereEqualTo("name", ParseUser.getCurrentUser().getString("name"));
                         try
@@ -86,6 +88,27 @@ public class EventDetails extends Activity {
                                 accept_button.setVisibility(View.VISIBLE);
                                 decline_button.setVisibility(View.VISIBLE);
                             }
+                            else
+                            {
+                                accept_button.setVisibility(View.GONE);
+                                decline_button.setVisibility(View.GONE);
+                            }
+                        }
+                        catch(ParseException ex)
+                        {
+                            System.out.println("Query didn't work");
+                            ex.printStackTrace();
+                        }
+
+                        //  Set View map button to visible only if current User is on the attendee list
+                        ParseQuery att_query = object.getRelation("attendees").getQuery();
+                        inv_query.whereEqualTo("name", ParseUser.getCurrentUser().getString("name"));
+                        try
+                        {
+                            if(!att_query.find().isEmpty())
+                                map_button.setVisibility(View.VISIBLE);
+                            else
+                                map_button.setVisibility(View.GONE);
                         }
                         catch(ParseException ex)
                         {
@@ -124,6 +147,19 @@ public class EventDetails extends Activity {
                                 // Go to eventView
                                 Intent intent = new Intent(EventDetails.this, eventView.class);
                                 startActivity(intent);
+                            }
+                        });
+
+                        map_button.setOnClickListener(new View.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(View arg0)
+                            {
+                                // Pass event name to MapActivity and go there
+                                Intent myIntent = new Intent(EventDetails.this, MapActivity.class);
+                                myIntent.putExtra("eventName", eventName);
+                                EventDetails.this.startActivity(myIntent);
+
                             }
                         });
                     }
