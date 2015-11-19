@@ -13,8 +13,14 @@ import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.android.gms.maps.model.LatLng;
 import com.parse.Parse;
 import com.parse.*;
 
@@ -28,6 +34,10 @@ public class newEventInfo extends Activity {
     private Button button;
     private NewEventCustomAdapter adapter;
     private ParseObject eventinfo;
+    public ParseGeoPoint point;
+
+    private static final int REQUEST_PLACE_PICKER = 1;
+    Context mContext = this;
 
 
     @Override
@@ -45,6 +55,7 @@ public class newEventInfo extends Activity {
 
         //createEvent();
         addListenerOnButton();
+        editTextClickerListener();
     }
 
     @Override
@@ -52,6 +63,20 @@ public class newEventInfo extends Activity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_new_event_info, menu);
         return true;
+    }
+
+    private void editTextClickerListener(){
+        EditText x = (EditText) findViewById(R.id.location_editText);
+
+        x.setClickable(true);
+        x.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                placepicker();
+                System.out.println("IT WORKS!!!");
+            }
+        });
+
     }
 
     private void addListenerOnButton() {
@@ -89,6 +114,7 @@ public class newEventInfo extends Activity {
                 eventinfo.put("eventDate", date);
                 eventinfo.put("eventTime", time);
                 eventinfo.put("eventCreator", currentUser);
+                eventinfo.put("placeLocation", point);
 
                 System.out.println("Saved in background");
                 System.out.println("Current User ID: " + currentUser);
@@ -96,24 +122,20 @@ public class newEventInfo extends Activity {
 
                 // Get the names of the friends who were checked
                 ArrayList<String> inviteeList = adapter.getInviteeList();
-                if(inviteeList.isEmpty())
+                if (inviteeList.isEmpty())
                     System.out.println("inviteeList was empty");
 
                 // Add friends who were checked to invitees relation, send them a notification
                 ParseRelation<ParseUser> inv_relation = eventinfo.getRelation("invitees");
-                for(String invitee : inviteeList)
-                {
+                for (String invitee : inviteeList) {
                     ParseQuery<ParseUser> query = ParseUser.getQuery();
                     query.whereEqualTo("name", invitee);
-                    try
-                    {
+                    try {
                         /*  Normally, query.getFirstInBackground would be used, but we want query to
                             finish before saveInBackground */
                         ParseUser user = (ParseUser) query.getFirst();
                         inv_relation.add(user);
-                    }
-                    catch(ParseException e)
-                    {
+                    } catch (ParseException e) {
                         System.out.println("Query didn't work");
                     }
 
@@ -168,6 +190,7 @@ public class newEventInfo extends Activity {
                 eventinfo.put("eventLocationAddress", location);
                 eventinfo.put("eventDate", date);
                 eventinfo.put("eventTime", time);
+
                 eventinfo.saveInBackground();
 
 
@@ -191,4 +214,46 @@ public class newEventInfo extends Activity {
 
         return super.onOptionsItemSelected(item);
     }
+
+
+    public void placepicker()
+    {
+        try{
+
+            PlacePicker.IntentBuilder intentbuilder = new PlacePicker.IntentBuilder();
+            Intent intent = intentbuilder.build(this);
+
+            startActivityForResult(intent,REQUEST_PLACE_PICKER);
+
+        }catch (GooglePlayServicesRepairableException e){
+            System.out.println("Error");
+        }catch (GooglePlayServicesNotAvailableException e){
+            System.out.println("Error");
+        }
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_PLACE_PICKER) {
+
+            if (resultCode == RESULT_OK) {
+
+
+                final Place place = PlacePicker.getPlace(data, mContext);
+
+               // String toastMsg = String.format(place.getName());
+                EditText finaladdress = (EditText)findViewById(R.id.location_editText);
+                finaladdress.setText(place.getAddress());
+
+                double temp = place.getLatLng().longitude;
+                double temp2 = place.getLatLng().latitude;
+                point = new ParseGeoPoint(temp2,temp);
+                System.out.println(point);
+
+                Toast.makeText(this, place.getAddress(), Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+
+
 }

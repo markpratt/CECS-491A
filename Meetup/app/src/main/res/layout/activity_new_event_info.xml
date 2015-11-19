@@ -44,7 +44,8 @@
         android:id="@+id/location_editText"
         android:layout_below="@+id/details_editText"
         android:layout_alignParentStart="true"
-        android:hint="Location" />
+        android:hint="Location"
+        android:clickable="true" />
 
     <EditText
         android:layout_width="match_parent"
