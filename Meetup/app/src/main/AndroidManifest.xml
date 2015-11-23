@@ -104,7 +104,12 @@
         </activity>
         <activity
             android:name=".EventsInvitedTo"
-            android:label="@string/title_activity_event_invited" >
+            android:label="@string/title_activity_event_invited"
+            android:parentActivityName=".eventView">
+            <!-- The meta-data element is needed for versions lower than 4.1 -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".eventView" />
         </activity>
         <activity
             android:name=".EventsAttending"

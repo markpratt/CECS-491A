@@ -106,7 +106,11 @@ public class EventDetails extends Activity {
                         try
                         {
                             if(!att_query.find().isEmpty())
+                            {
                                 map_button.setVisibility(View.VISIBLE);
+                                // Start tracking user
+                                GPSTracker gps = new GPSTracker(EventDetails.this);
+                            }
                             else
                                 map_button.setVisibility(View.GONE);
                         }
