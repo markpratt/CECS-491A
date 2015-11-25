@@ -33,7 +33,6 @@ import java.util.List;
 
 public class MapActivity extends FragmentActivity implements OnMapReadyCallback
 {
-
     private GoogleMap mMap;
     GPSTracker gps;
     double userLatitude;
@@ -59,21 +58,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback
         // check if GPS enabled
         if(gps.canGetLocation())
         {
-            try
-            {
-                userLatitude = gps.getLatitude();
-                userLongitude = gps.getLongitude();
-                curr_user_location = new LatLng(userLatitude, userLongitude);
-            }
-            // If a user's coordinates are currently undefined, set them to (0,0)
-            catch(Exception ex)
-            {
-                System.out.println("User's coordinates are currently undefined.");
-                userLatitude = 0;
-                userLongitude = 0;
-                curr_user_location = new LatLng(userLatitude, userLongitude);
-            }
-
+            set_curr_user_location();
         }
         else
         {
@@ -91,42 +76,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback
         {
             Log.d("debug", "Intent was ok");
             eventName = myInput.getString("eventName");
-
-            //  Assume eventName is unique. Perform query to get event's attendees
-            ParseQuery<ParseObject> query = ParseQuery.getQuery("event");
-            query.whereEqualTo("eventName", eventName);
-            try
-            {
-                // Get attendees list for this event
-                ParseRelation relation = query.getFirst().getRelation("attendees");
-                ParseQuery list_query = relation.getQuery();
-                attendeeList = list_query.find();
-                // Get attendees' locations
-                attendees_locations = new ArrayList<LatLng>();
-                for (int i = 0; i < attendeeList.size(); i++)
-                {
-                    try
-                    {
-                        double lat = (double) attendeeList.get(i).getNumber("Latitude");
-                        double lon = (double) attendeeList.get(i).getNumber("Longitude");
-                        LatLng attendeeLoc = new LatLng(lat, lon);
-                        attendees_locations.add(attendeeLoc);
-                    }
-                    // If an attendee's coordinates are currently undefined, set them to (0,0)
-                    catch(Exception ex)
-                    {
-                        System.out.println("Attendee's coordinates are currently undefined.");
-                        double lat = 0;
-                        double lon = 0;
-                        LatLng attendeeLoc = new LatLng(lat, lon);
-                        attendees_locations.add(attendeeLoc);
-                    }
-                }
-            }
-            catch(ParseException exception)
-            {
-                System.out.println("query.find() didn't work");
-            }
+            build_attendees_locations_list();
         }
     }
 
@@ -147,17 +97,9 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback
         uiSettings.setZoomControlsEnabled(true);
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
-        // Add a marker for each attendee
-        for(int i = 0; i<attendees_locations.size(); i++)
-        {
-            mMap.addMarker(new MarkerOptions().position(attendees_locations.get(i)).
-                    title(attendeeList.get(i).getString("name")));
-        }
+        add_attendee_markers();
 
-        // Move camera to current user's location
-        CameraUpdate update = CameraUpdateFactory.newLatLngZoom(curr_user_location, 10);
-        mMap.animateCamera(update);
-
+        move_camera_to_curr_user(10);
 
         // When update button clicked, replot markers and move camera again
         Button update_button = (Button) findViewById(R.id.update_button);
@@ -167,47 +109,79 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback
             public void onClick(View arg0)
             {
                 mMap.clear();
-                //  Assume eventName is unique. Perform query to get event's attendees
-                ParseQuery<ParseObject> query = ParseQuery.getQuery("event");
-                query.whereEqualTo("eventName", eventName);
-                try
-                {
-                    // Get attendees list for this event
-                    ParseRelation relation = query.getFirst().getRelation("attendees");
-                    ParseQuery list_query = relation.getQuery();
-                    attendeeList = list_query.find();
-                    // Get attendees' locations
-                    attendees_locations = new ArrayList<LatLng>();
-                    for (int i = 0; i < attendeeList.size(); i++)
-                    {
-                        double lat = (double) attendeeList.get(i).getNumber("Latitude");
-                        double lon = (double) attendeeList.get(i).getNumber("Longitude");
-                        LatLng attendeeLoc = new LatLng(lat, lon);
-                        attendees_locations.add(attendeeLoc);
-                    }
-                }
-                catch(ParseException exception)
-                {
-                    System.out.println("query.find() didn't work");
-                }
+                build_attendees_locations_list();
+                add_attendee_markers();
 
+                set_curr_user_location();
+                move_camera_to_curr_user(10);
 
-                // Add a marker for each attendee
-                for(int i = 0; i<attendees_locations.size(); i++)
-                {
-                    mMap.addMarker(new MarkerOptions().position(attendees_locations.get(i)).
-                            title(attendeeList.get(i).getString("name")));
-                }
-
-                // Move camera to current user's location
-                userLatitude = gps.getLatitude();
-                userLongitude = gps.getLongitude();
-                curr_user_location = new LatLng(userLatitude, userLongitude);
-                CameraUpdate update = CameraUpdateFactory.newLatLngZoom(curr_user_location, 10);
-                mMap.animateCamera(update);
             }
         });
 
+    }
+
+    /******************Below are helper methods for common tasks performed above******************/
+
+    public void move_camera_to_curr_user(int zoomLevel)
+    {
+        CameraUpdate update = CameraUpdateFactory.newLatLngZoom(curr_user_location, zoomLevel);
+        mMap.animateCamera(update);
+    }
+
+    public void set_curr_user_location()
+    {
+        userLatitude = gps.getLatitude();
+        userLongitude = gps.getLongitude();
+        curr_user_location = new LatLng(userLatitude, userLongitude);
+    }
+
+    public void add_attendee_markers()
+    {
+        // Add a marker for each attendee
+        for(int i = 0; i<attendees_locations.size(); i++)
+        {
+            mMap.addMarker(new MarkerOptions().position(attendees_locations.get(i)).
+                    title(attendeeList.get(i).getString("name")));
+        }
+    }
+
+    public void build_attendees_locations_list()
+    {
+        //  Assume eventName is unique. Perform query to get event's attendees
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("event");
+        query.whereEqualTo("eventName", eventName);
+        try
+        {
+            // Get attendees list for this event
+            ParseRelation relation = query.getFirst().getRelation("attendees");
+            ParseQuery list_query = relation.getQuery();
+            attendeeList = list_query.find();
+            // Get attendees' locations
+            attendees_locations = new ArrayList<LatLng>();
+            for (int i = 0; i < attendeeList.size(); i++)
+            {
+                try
+                {
+                    double lat = (double) attendeeList.get(i).getNumber("Latitude");
+                    double lon = (double) attendeeList.get(i).getNumber("Longitude");
+                    LatLng attendeeLoc = new LatLng(lat, lon);
+                    attendees_locations.add(attendeeLoc);
+                }
+                // If an attendee's coordinates are currently undefined, set them to (0,0)
+                catch(Exception ex)
+                {
+                    System.out.println("Attendee's coordinates are currently undefined.");
+                    double lat = 0;
+                    double lon = 0;
+                    LatLng attendeeLoc = new LatLng(lat, lon);
+                    attendees_locations.add(attendeeLoc);
+                }
+            }
+        }
+        catch(ParseException exception)
+        {
+            System.out.println("query.find() didn't work");
+        }
     }
 
 }
