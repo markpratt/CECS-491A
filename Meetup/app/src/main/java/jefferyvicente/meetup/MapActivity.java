@@ -50,6 +50,39 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback
         setContentView(R.layout.activity_maps);
         getActionBar().hide();
 
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+
+        gps = new GPSTracker(MapActivity.this);
+        // check if GPS enabled
+        if(gps.canGetLocation())
+        {
+            try
+            {
+                userLatitude = gps.getLatitude();
+                userLongitude = gps.getLongitude();
+                curr_user_location = new LatLng(userLatitude, userLongitude);
+            }
+            // If a user's coordinates are currently undefined, set them to (0,0)
+            catch(Exception ex)
+            {
+                System.out.println("User's coordinates are currently undefined.");
+                userLatitude = 0;
+                userLongitude = 0;
+                curr_user_location = new LatLng(userLatitude, userLongitude);
+            }
+
+        }
+        else
+        {
+            // can't get location
+            // GPS or Network is not enabled
+            // Ask user to enable GPS/network in settings
+            gps.showSettings();
+        }
+
         // Get eventName from EventDetails
         Bundle myInput = this.getIntent().getExtras();
         if (myInput == null)
@@ -72,10 +105,22 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback
                 attendees_locations = new ArrayList<LatLng>();
                 for (int i = 0; i < attendeeList.size(); i++)
                 {
-                    double lat = (double) attendeeList.get(i).getNumber("Latitude");
-                    double lon = (double) attendeeList.get(i).getNumber("Longitude");
-                    LatLng attendeeLoc = new LatLng(lat, lon);
-                    attendees_locations.add(attendeeLoc);
+                    try
+                    {
+                        double lat = (double) attendeeList.get(i).getNumber("Latitude");
+                        double lon = (double) attendeeList.get(i).getNumber("Longitude");
+                        LatLng attendeeLoc = new LatLng(lat, lon);
+                        attendees_locations.add(attendeeLoc);
+                    }
+                    // If an attendee's coordinates are currently undefined, set them to (0,0)
+                    catch(Exception ex)
+                    {
+                        System.out.println("Attendee's coordinates are currently undefined.");
+                        double lat = 0;
+                        double lon = 0;
+                        LatLng attendeeLoc = new LatLng(lat, lon);
+                        attendees_locations.add(attendeeLoc);
+                    }
                 }
             }
             catch(ParseException exception)
@@ -83,30 +128,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback
                 System.out.println("query.find() didn't work");
             }
         }
-
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
-
-        gps = new GPSTracker(MapActivity.this);
-        // check if GPS enabled
-        if(gps.canGetLocation())
-        {
-            userLatitude = gps.getLatitude();
-            userLongitude = gps.getLongitude();
-            curr_user_location = new LatLng(userLatitude, userLongitude);
-        }
-        else
-        {
-            // can't get location
-            // GPS or Network is not enabled
-            // Ask user to enable GPS/network in settings
-            gps.showSettings();
-        }
-
     }
-
 
     /**
      * Manipulates the map once available.
