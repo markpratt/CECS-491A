@@ -5,6 +5,7 @@ package jefferyvicente.meetup;
  */
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -12,9 +13,16 @@ import android.widget.TextView;
 import android.content.Context;
 import android.content.Intent;
 
+import com.parse.FindCallback;
+import com.parse.ParseException;
 import com.parse.ParseInstallation;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.ui.ParseLoginBuilder;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  * Shows the user profile. This simple activity can function regardless of whether the user
@@ -34,8 +42,6 @@ public class SampleActivity extends Activity {
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
 
         //toEventView();
         getActionBar().hide();
@@ -68,28 +74,62 @@ public class SampleActivity extends Activity {
     }
 
     @Override
-    protected void onStart() {
+    protected void onStart()
+    {
         super.onStart();
 
         currentUser = ParseUser.getCurrentUser();
-        if (currentUser != null) {
-        /*
-            - Save installation data for push notifications.
-            -
-            Ideally, installation info would be saved once on signup.  As written, info may be saved
-            every time Meetup runs.  However, Parse docs say that ParseInstallation is smart, and
-            doesn't save if no change has been made to record, so current strategy may be ok.
-            Maybe try later:  import other activities from ParseUILogin, modify SignUpFragment and
-            try to get this app to to use the modified version.
-        */
+        if (currentUser != null)
+        {
+            /*
+                - Save installation data for push notifications.
+                -
+                Ideally, installation info would be saved once on signup.  As written, info may be saved
+                every time Meetup runs.  However, Parse docs say that ParseInstallation is smart, and
+                doesn't save if no change has been made to record, so current strategy may be ok.
+                Maybe try later:  import other activities from ParseUILogin, modify SignUpFragment and
+                try to get this app to to use the modified version.
+            */
             ParseUser currentUser = ParseUser.getCurrentUser();
             ParseInstallation installation = ParseInstallation.getCurrentInstallation();
             installation.put("name", currentUser.getString("name"));
             installation.put("email", currentUser.getEmail());
             installation.saveInBackground();
 
+            // Get current date
+            Date currentDate = new Date();
+
+            // Obtain cutoff date by subtracting 86400000 milliseconds (1 day) from currentDate
+            long curr_date_minus_1_day = currentDate.getTime() - 86400000;
+            Date cutoffDate = new Date(curr_date_minus_1_day);
+
+            // Retrieve events older than the cutoff date and delete them
+            ParseQuery<ParseObject> query = ParseQuery.getQuery("event");
+            query.whereLessThanOrEqualTo("createdAt", cutoffDate);
+            query.findInBackground(new FindCallback<ParseObject>()
+            {
+                public void done(List<ParseObject> eventList, ParseException e)
+                {
+                    if (e == null)
+                    {
+                        Log.d("event", "Retrieved " + eventList.size() + " events");
+
+                        /*  deleteAllInBackground is used because it's quicker than deleting each object individually.
+                            Although slower, it may be better to use deleteEventually() instead, since it deletes even when
+                            Parse currently inaccessible */
+                        ParseObject.deleteAllInBackground(eventList);
+                    }
+                    else
+                    {
+                        Log.d("event", "Error: " + e.getMessage());
+                    }
+                }
+            });
+
             showProfileLoggedIn();
-        } else {
+        }
+        else
+        {
             showProfileLoggedOut();
         }
     }
